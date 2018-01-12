@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Web;
-using Sitecore.Analytics;
-using Sitecore.Analytics.Configuration;
+﻿using Sitecore.Analytics.Configuration;
 using Sitecore.Analytics.Data;
 using Sitecore.Analytics.Pipelines.EnsureSessionContext;
 using Sitecore.Analytics.Pipelines.ExcludeRobots;
@@ -12,10 +8,14 @@ using Sitecore.Analytics.Tracking;
 using Sitecore.Analytics.Tracking.Diagnostics.PerformanceCounters;
 using Sitecore.Analytics.Web;
 using Sitecore.Common;
-using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.Sites;
+using System;
+using System.Threading;
+using System.Web;
+using Sitecore.Analytics;
+using Sitecore.Data.Fields;
 
 namespace Sitecore.Support.Analytics
 {
@@ -125,6 +125,9 @@ namespace Sitecore.Support.Analytics
       }
       if (this.ExcludeRequest())
       {
+        Tracker.Current.Session.CreateInteraction(new HttpContextWrapper(HttpContext.Current));
+        Tracker.Current.Session.Contact.System.VisitCount--;
+        Tracker.Current.Session.Interaction.ContactVisitIndex = Tracker.Current.Session.Contact.System.VisitCount;
         Log.Debug("The request was excluded because the Agent or IP is determined as a robot, see Exclude robots configuration file", typeof(Tracker));
         AnalyticsTrackingCount.CollectionRobotRequests.Increment(1L);
         return;
